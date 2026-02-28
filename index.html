@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="es" class="bg-[#0a0f0b]">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>D'lachina | Alta Repostería</title>
+    
+    <!-- Fuentes Ultra Modernas: Syne (Títulos) y Space Grotesk (Cuerpos) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            ultraDark: '#0a0f0b', 
+                            surface: '#162218',   
+                            light: '#e5e9cc',     
+                            accent: '#d4a373',    
+                            muted: '#8b9680'      
+                        }
+                    },
+                    fontFamily: {
+                        heading: ['"Syne"', 'sans-serif'],
+                        body: ['"Space Grotesk"', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* ==========================================
+           1. RESET Y TEXTURAS FUTURISTAS
+           ========================================== */
+        body {
+            background-color: #0a0f0b; 
+            color: #e5e9cc; 
+            overflow-x: hidden;
+            cursor: none; 
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Ruido estático de fondo para textura premium */
+        .noise {
+            position: fixed; inset: 0; z-index: 9998;
+            pointer-events: none; opacity: 0.04;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+            mix-blend-mode: overlay;
+        }
+
+        /* ==========================================
+           2. CURSOR MAGNÉTICO
+           ========================================== */
+        .cursor-dot {
+            position: fixed; top: 0; left: 0;
+            width: 8px; height: 8px;
+            background: #d4a373; 
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 9999; pointer-events: none;
+            transition: width 0.2s, height 0.2s;
+        }
+        .cursor-ring {
+            position: fixed; top: 0; left: 0;
+            width: 50px; height: 50px;
+            border: 1px solid rgba(212, 163, 115, 0.5);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 9999; pointer-events: none;
+            transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1), 
+                        height 0.4s cubic-bezier(0.16, 1, 0.3, 1), 
+                        background 0.4s, border-color 0.4s;
+            will-change: width, height, transform;
+        }
+        body.is-hovering .cursor-ring {
+            width: 110px; height: 110px;
+            background: rgba(212, 163, 115, 0.15);
+            backdrop-filter: blur(3px);
+            border-color: #d4a373;
+        }
+        body.is-hovering .cursor-dot { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+
+        /* Fallback visible por si el mouse falla o en móviles */
+        @media (pointer: coarse) {
+            body { cursor: auto; }
+            .cursor-dot, .cursor-ring { display: none !important; }
+        }
+
+        /* ==========================================
+           3. BOTÓN CON PROPÓSITO
+           ========================================== */
+        .btn-purpose {
+            position: relative; display: inline-flex; align-items: center; justify-content: center;
+            padding: 1.5rem 4.5rem;
+            background: transparent;
+            border: 1px solid rgba(229, 233, 204, 0.3); 
+            border-radius: 100px;
+            color: #e5e9cc;
+            font-family: 'Space Grotesk', sans-serif;
+            text-transform: uppercase; letter-spacing: 0.25em; font-size: 0.85rem; font-weight: 500;
+            overflow: hidden;
+            transition: border-color 0.4s ease, transform 0.3s ease;
+            cursor: pointer;
+            z-index: 20;
+        }
+        .btn-purpose::before {
+            content: ''; position: absolute;
+            top: 100%; left: 50%;
+            width: 150%; height: 200%;
+            background: #d4a373; 
+            border-radius: 50%;
+            transform: translateX(-50%);
+            transition: top 0.6s cubic-bezier(0.19, 1, 0.22, 1);
+            z-index: 1;
+        }
+        .btn-purpose:hover { 
+            border-color: transparent; 
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(212, 163, 115, 0.2);
+        }
+        .btn-purpose:hover::before { top: -20%; }
+        .btn-purpose span {
+            position: relative; z-index: 2;
+            transition: color 0.4s cubic-bezier(0.19, 1, 0.22, 1);
+        }
+        .btn-purpose:hover span { color: #0a0f0b; font-weight: 700; }
+
+        /* ==========================================
+           4. MASONRY GRID Y BORDES ULTRA-SUAVES
+           ========================================== */
+        .auto-masonry {
+            column-count: 1;
+            column-gap: 2.5rem;
+            padding-bottom: 5rem;
+        }
+        @media (min-width: 640px) { .auto-masonry { column-count: 2; } }
+        @media (min-width: 1024px) { .auto-masonry { column-count: 3; } }
+        @media (min-width: 1536px) { .auto-masonry { column-count: 4; } }
+
+        .masonry-item {
+            break-inside: avoid;
+            margin-bottom: 2.5rem;
+            position: relative;
+            transform: translateZ(0);
+            content-visibility: auto;
+            contain-intrinsic-size: 600px;
+        }
+
+        .product-card {
+            border-radius: 2.5rem; 
+            overflow: hidden;
+            position: relative;
+            background: transparent;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.6);
+            transform-style: preserve-3d;
+            -webkit-mask-image: -webkit-radial-gradient(white, black);
+            mask-image: radial-gradient(white, black);
+        }
+
+        .product-card img {
+            width: 100%; height: auto; display: block;
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+            transition: transform 1.2s cubic-bezier(0.19, 1, 0.22, 1);
+            transform: scale(1.03); 
+        }
+        
+        .product-card:hover img {
+            transform: scale(1.08);
+        }
+
+        /* ==========================================
+           5. ANIMACIONES INCISIVAS (3 ESTADOS)
+           ========================================== */
+        .awwwards-reveal {
+            opacity: 0;
+            filter: blur(25px);
+            transform: translateY(100px) scale(0.85);
+            clip-path: polygon(0 100%, 100% 100%, 100% 100%, 0 100%); 
+            transition: opacity 1.2s ease, filter 1.2s ease, transform 1.2s cubic-bezier(0.16, 1, 0.3, 1), clip-path 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+            will-change: transform, opacity, filter, clip-path;
+        }
+        .awwwards-reveal.is-inview {
+            opacity: 1;
+            filter: blur(0);
+            transform: translateY(0) scale(1);
+            clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%); 
+        }
+        .awwwards-reveal.is-outview-top {
+            opacity: 0;
+            filter: blur(15px);
+            transform: translateY(-80px) scale(0.95);
+            clip-path: polygon(0 0, 100% 0, 100% 0%, 0 0%); 
+        }
+
+        /* Glassmorphism Navbar */
+        .nav-glass {
+            background: rgba(10, 15, 11, 0.7);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(229, 233, 204, 0.05);
+        }
+
+        .back-to-top {
+            position: fixed;
+            right: 1.25rem;
+            bottom: 1.25rem;
+            z-index: 60;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.4rem;
+            padding: 0.85rem 1.1rem;
+            border-radius: 999px;
+            border: 1px solid rgba(229, 233, 204, 0.25);
+            background: rgba(10, 15, 11, 0.82);
+            backdrop-filter: blur(10px);
+            color: #e5e9cc;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 0.68rem;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+            transform: translateY(12px);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.28s ease, transform 0.28s ease, border-color 0.28s ease;
+        }
+
+        .back-to-top.is-visible {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
+        }
+
+        .back-to-top:hover {
+            border-color: rgba(212, 163, 115, 0.8);
+        }
+    </style>
+</head>
+<body class="selection:bg-brand-accent selection:text-brand-ultraDark">
+
+    <div class="noise"></div>
+
+    <!-- Cursor Magnético -->
+    <div class="cursor-dot hidden md:block" id="cursor-dot"></div>
+    <div class="cursor-ring hidden md:block" id="cursor-ring"></div>
+
+    <button id="back-to-top" class="back-to-top cursor-target" type="button" aria-label="Volver arriba">
+        ↑ Inicio
+    </button>
+
+    <!-- Nav Minimalista -->
+    <nav id="navbar" class="fixed w-full top-0 z-50 p-8 flex justify-between items-center transition-all duration-500">
+        <div class="font-heading text-3xl font-bold tracking-tighter cursor-target text-brand-light cursor-pointer" onclick="smoothScroll('#inicio', event)">D'LACHINA</div>
+        <div class="hidden md:flex gap-12 font-body text-xs tracking-[0.3em] uppercase text-brand-light">
+            <a href="#menu" class="cursor-target hover:text-brand-accent transition duration-300" onclick="smoothScroll('#menu', event)">La Colección</a>
+            <a href="#ubicacion" class="cursor-target hover:text-brand-accent transition duration-300" onclick="smoothScroll('#ubicacion', event)">Encuéntranos</a>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="inicio" class="relative min-h-screen flex items-center justify-center px-6 overflow-hidden pt-20">
+        
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[90vw] h-[90vw] md:w-[45vw] md:h-[45vw] bg-brand-surface rounded-full blur-[120px] pointer-events-none"></div>
+        <div class="absolute bottom-0 right-0 w-[50vw] h-[50vw] bg-brand-accent/10 rounded-full blur-[150px] pointer-events-none mix-blend-screen animate-pulse"></div>
+
+        <div class="text-center z-10 max-w-6xl mx-auto">
+            <p class="awwwards-reveal font-body uppercase tracking-[0.6em] text-brand-accent text-sm md:text-base mb-8 font-medium">Repostería de Autor</p>
+            
+            <h1 class="awwwards-reveal font-heading text-6xl md:text-[8rem] lg:text-[9.5rem] leading-[0.85] tracking-tighter mb-12 text-brand-light" style="transition-delay: 0.1s;">
+                ARTE EN<br>
+                <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-light via-brand-accent to-brand-muted italic pr-4">CADA BOCADO.</span>
+            </h1>
+            
+            <div class="awwwards-reveal" style="transition-delay: 0.2s;">
+                <button class="btn-purpose cursor-target mt-8" onclick="scrollToGallery(event)">
+                    <span>Revelar Experiencia</span>
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Galería Automatizada -->
+    <section id="menu" class="py-40 px-6 md:px-12 relative z-20 bg-brand-surface rounded-t-[4rem] shadow-[0_-40px_100px_rgba(0,0,0,0.8)] border-t border-brand-light/5">
+        <div class="container mx-auto">
+            
+            <div class="flex flex-col md:flex-row justify-between md:items-center w-full mb-32 is-inview">
+                <div>
+                    <h2 class="font-heading text-5xl md:text-7xl font-bold tracking-tighter text-brand-light">CATÁLOGO <span id="catalog-count" class="text-brand-accent italic font-normal">00</span></h2>
+                </div>
+                <div class="flex items-center gap-4 mt-6 md:mt-0 shrink-0">
+                    <div class="w-2 h-2 rounded-full bg-brand-accent animate-pulse"></div>
+                    <p class="font-body text-brand-muted tracking-[0.3em] uppercase text-xs font-medium">Sincronización Activa</p>
+                </div>
+            </div>
+
+            <!-- Contenedor del Masonry -->
+            <div id="dynamic-gallery" class="auto-masonry">
+                <!-- Se inyecta vía JS -->
+            </div>
+
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer id="ubicacion" class="bg-brand-ultraDark text-brand-light py-32 px-6 border-t border-brand-surface">
+        <div class="container mx-auto grid grid-cols-1 md:grid-cols-2 gap-20 is-inview">
+            <div>
+                <h3 class="font-heading text-6xl md:text-8xl font-bold tracking-tighter mb-8">D'LACHINA</h3>
+                <p class="font-body text-xl text-brand-muted font-light max-w-md leading-relaxed">
+                    Narciso López entre Agramonte y Máximo Gómez.<br><br>
+                    <span class="text-brand-accent font-medium">Abierto todos los días.</span>
+                </p>
+            </div>
+            <div class="flex flex-col justify-end md:items-end">
+                <p class="font-body text-xs tracking-[0.4em] uppercase text-brand-muted mb-6 font-semibold">Conecta con la vanguardia</p>
+                <div class="flex gap-8">
+                    <a href="#" class="cursor-target font-heading text-3xl hover:text-brand-accent transition duration-300 italic">Instagram</a>
+                    <a href="#" class="cursor-target font-heading text-3xl hover:text-brand-accent transition duration-300 italic">Facebook</a>
+                </div>
+            </div>
+        </div>
+        <div class="container mx-auto mt-32 pt-8 border-t border-brand-surface flex justify-between text-xs font-body tracking-widest uppercase text-brand-muted">
+            <p>&copy; 2026 D'lachina</p>
+            <p>Diseño Sensorial</p>
+        </div>
+    </footer>
+
+    <!-- ==========================================
+         JAVASCRIPT ROBUSTO
+         ========================================== -->
+    <script>
+        /**
+         * 1. FUENTE LOCAL DE IMÁGENES
+         */
+        const listaDeImagenes = [
+            "ha/81126d07-605d-46e9-b685-eccd89b84a3e.JPG", "ha/0719ccae-d8c5-456a-9639-4db728b23780.JPG",
+            "ha/65711a3a-7427-4e53-8054-0e2270d64007.JPG", "ha/de0f0ddf-ae92-4b4f-8678-d659829c49a8.JPG",
+            "ha/21f5a88c-df10-4e0f-8186-334a41fc569e.JPG", "ha/d194ef62-3e50-431e-b56e-a6113405a47a.JPG",
+            "ha/af74d2ef-69df-4e6d-ad88-bd7ac95b0bc8.JPG", "ha/057004d8-1d1c-4d3a-9253-4d0d4bc64e0f.JPG",
+            "ha/920c2202-f71d-4162-aad5-c849dcb93b84.JPG", "ha/744cdbcd-dff9-448e-ac4f-0a397d5336d0.JPG",
+            "ha/e583e3ad-0aa3-410f-83e6-418bd94c3331.JPG", "ha/1941d49e-0f93-42f5-870e-d6824d77ea26.JPG",
+            "ha/047f582d-70ef-4238-8038-aea7d1a8351e.JPG", "ha/77aa28a3-1d83-440a-b003-a86f800dc28e.JPG",
+            "ha/40813114-a941-49d2-a2d6-e8ad45651205.JPG", "ha/701a383b-5d5a-4553-922b-7b88943d832e.JPG",
+            "ha/57e6d4f1-7aea-4603-bcda-781820cbf031.JPG", "ha/1a6a427c-92a5-44eb-b176-eacbaf678519.JPG",
+            "ha/16e91131-2056-4fa2-896e-ce4a558c37fb.JPG", "ha/978e6d46-ed3a-49d7-8c78-71d190f4ee2f.JPG",
+            "ha/b9c14f86-4669-459f-ad8a-885792ad6c9a.JPG", "ha/422d5e27-992a-48d3-b537-d55c1cfdfb23.JPG",
+            "ha/db0ac7e7-6c12-454f-939b-4c8fe8d186d2.JPG", "ha/51d637d5-221d-4a0c-b224-8ca2a52cc623.JPG",
+            "ha/71b51fa2-65e3-47e4-9cd7-2b5d6f1ba443.JPG", "ha/40d476e7-3463-41ba-81da-f9b1c2045ed6.JPG",
+            "ha/d8ba124e-f666-4463-87ba-47251b5dfb3a.JPG", "ha/bb117623-0a3d-4ea6-81f5-19882dd3c2c2.JPG",
+            "ha/1f135327-5c96-4fc6-937e-6c012cd0bc36.JPG", "ha/c71707d2-a33e-4f08-b7c6-5a5a15e9d452.JPG",
+            "ha/9ab92275-93ab-403a-81e5-bef34dc7e4cf.JPG", "ha/9ce24c5a-bd4b-441c-b2ea-cf3394b5902a.JPG",
+            "ha/417e1cab-1142-49cd-bbd3-8462d23488b5.JPG", "ha/08b745d9-df38-4c89-b062-4b3980ffccbb.JPG",
+            "ha/4d99f898-2c9f-4316-97c5-a1267ae9ed68.JPG", "ha/797cdbd9-0a72-43d5-a71f-bef9fc6e0375.JPG",
+            "ha/6765c88b-8d93-4730-ab62-5f59accec9c0.JPG", "ha/5c067607-17ed-4758-92a5-654a708d783e.JPG",
+            "ha/3434ff13-6bde-4477-839f-95d2a3d071c8.JPG", "ha/681c99e5-3879-48ab-8185-e8270daa45c0.JPG"
+        ];
+
+        // 2. INYECTAR GALERÍA
+        const galeria = document.getElementById('dynamic-gallery');
+        const fallbackImage = 'https://images.unsplash.com/photo-1551024601-bec78aea704b?auto=format&fit=crop&q=80&w=600';
+        const filenameCollator = new Intl.Collator('es', { numeric: true, sensitivity: 'base' });
+
+        let scrollObserverRef = null;
+
+        function bindCursorTargets(scope = document) {
+            scope.querySelectorAll('.cursor-target').forEach(el => {
+                if (el.dataset.cursorBound === '1') return;
+                el.dataset.cursorBound = '1';
+                el.addEventListener('mouseenter', () => document.body.classList.add('is-hovering'));
+                el.addEventListener('mouseleave', () => document.body.classList.remove('is-hovering'));
+            });
+        }
+
+        function observeRevealElements(scope = document) {
+            if (!scrollObserverRef) return;
+            scope.querySelectorAll('.awwwards-reveal').forEach((el) => {
+                if (el.closest('#inicio')) return;
+                scrollObserverRef.observe(el);
+            });
+        }
+
+        function playHeroIntroAnimation() {
+            const heroElements = document.querySelectorAll('#inicio .awwwards-reveal');
+            if (!heroElements.length) return;
+
+            heroElements.forEach((el) => {
+                el.classList.remove('is-inview', 'is-outview-top');
+                void el.offsetHeight;
+            });
+
+            requestAnimationFrame(() => {
+                heroElements.forEach((el) => el.classList.add('is-inview'));
+            });
+        }
+
+        function prepararImagenes(imagenes) {
+            const rutasNormalizadas = imagenes.map((archivo) => {
+                const nombreArchivo = archivo.split('/').pop();
+                return `./img/${nombreArchivo}`;
+            });
+
+            const unicas = [...new Set(rutasNormalizadas)];
+            return unicas.sort((a, b) => filenameCollator.compare(a, b));
+        }
+
+        function renderGallery(imagenes) {
+            if (!galeria) return;
+            galeria.innerHTML = '';
+
+            const imagenesOrdenadas = prepararImagenes(imagenes);
+            const fragment = document.createDocumentFragment();
+
+            imagenesOrdenadas.forEach((rutaImagen, index) => {
+                const card = document.createElement('div');
+                card.className = 'masonry-item is-inview cursor-target';
+
+                const productCard = document.createElement('div');
+                productCard.className = 'product-card';
+
+                const image = document.createElement('img');
+                image.src = rutaImagen;
+                image.alt = `Creación D'lachina ${String(index + 1).padStart(3, '0')}`;
+                image.decoding = 'async';
+                image.loading = index < 4 ? 'eager' : 'lazy';
+                image.fetchPriority = index < 4 ? 'high' : 'low';
+                image.addEventListener('error', () => {
+                    image.src = fallbackImage;
+                }, { once: true });
+
+                productCard.appendChild(image);
+                card.appendChild(productCard);
+                fragment.appendChild(card);
+            });
+
+            galeria.appendChild(fragment);
+
+            const countLabel = document.getElementById('catalog-count');
+            if (countLabel) {
+                countLabel.textContent = String(imagenesOrdenadas.length).padStart(2, '0');
+            }
+
+            bindCursorTargets(galeria);
+            observeRevealElements(galeria);
+        }
+
+        renderGallery(listaDeImagenes);
+
+        // 3. CURSOR MAGNÉTICO MATEMÁTICO
+        const cursorDot = document.getElementById('cursor-dot');
+        const cursorRing = document.getElementById('cursor-ring');
+        let mouseX = window.innerWidth / 2, mouseY = window.innerHeight / 2;
+        let ringX = mouseX, ringY = mouseY;
+
+        window.addEventListener('mousemove', (e) => {
+            mouseX = e.clientX; mouseY = e.clientY;
+            if(cursorDot) {
+                cursorDot.style.left = `${mouseX}px`;
+                cursorDot.style.top = `${mouseY}px`;
+            }
+        });
+
+        function renderCursor() {
+            ringX += (mouseX - ringX) * 0.15;
+            ringY += (mouseY - ringY) * 0.15;
+            if(cursorRing) {
+                cursorRing.style.transform = `translate(-50%, -50%) translate(${ringX}px, ${ringY}px)`;
+            }
+            requestAnimationFrame(renderCursor);
+        }
+        renderCursor();
+
+        bindCursorTargets();
+
+        // 4. INICIALIZADOR SEGURO DE ANIMACIONES
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            const observerOptions = {
+                threshold: 0.05,
+                rootMargin: "0px 0px -50px 0px"
+            };
+
+            scrollObserverRef = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (!entry.isIntersecting) return;
+
+                    entry.target.classList.add('is-inview');
+                    entry.target.classList.remove('is-outview-top');
+
+                    // Mantener visible tras la primera aparición
+                    observer.unobserve(entry.target);
+                });
+            }, observerOptions);
+
+            observeRevealElements();
+
+            const heroSection = document.getElementById('inicio');
+            let heroInView = false;
+
+            if (heroSection) {
+                const heroObserver = new IntersectionObserver((entries) => {
+                    entries.forEach((entry) => {
+                        if (entry.isIntersecting) {
+                            if (!heroInView) {
+                                playHeroIntroAnimation();
+                            }
+                            heroInView = true;
+                        } else {
+                            heroInView = false;
+                            document.querySelectorAll('#inicio .awwwards-reveal').forEach((el) => {
+                                el.classList.remove('is-inview', 'is-outview-top');
+                            });
+                        }
+                    });
+                }, {
+                    threshold: 0.55
+                });
+
+                heroObserver.observe(heroSection);
+            }
+
+            setTimeout(playHeroIntroAnimation, 250);
+        });
+
+        // 5. NAVBAR AL HACER SCROLL
+        window.addEventListener('scroll', () => {
+            const nav = document.getElementById('navbar');
+            const backToTop = document.getElementById('back-to-top');
+            if (window.scrollY > 50) {
+                nav.classList.add('nav-glass');
+                nav.classList.remove('py-8');
+                nav.classList.add('py-4');
+            } else {
+                nav.classList.remove('nav-glass');
+                nav.classList.add('py-8');
+                nav.classList.remove('py-4');
+            }
+
+            if (backToTop) {
+                if (window.scrollY > 320) {
+                    backToTop.classList.add('is-visible');
+                } else {
+                    backToTop.classList.remove('is-visible');
+                }
+            }
+        });
+
+        // 6. EVENTOS DE BOTONES
+        window.scrollToGallery = function(e) {
+            if(e) e.preventDefault();
+            const targetElement = document.getElementById('menu');
+            if(!targetElement) return;
+
+            document.body.classList.remove('is-hovering');
+            if(cursorRing) {
+                cursorRing.style.width = '250px';
+                cursorRing.style.height = '250px';
+                cursorRing.style.background = 'rgba(212, 163, 115, 0.1)';
+                cursorRing.style.borderColor = 'transparent';
+                
+                setTimeout(() => {
+                    cursorRing.style.width = '';
+                    cursorRing.style.height = '';
+                    cursorRing.style.background = '';
+                    cursorRing.style.borderColor = '';
+                }, 600);
+            }
+
+            const offsetTop = targetElement.getBoundingClientRect().top + window.scrollY;
+            window.scrollTo({
+                top: offsetTop,
+                behavior: 'smooth'
+            });
+        };
+
+        window.smoothScroll = function(selector, event) {
+            if(event) event.preventDefault();
+            const target = document.querySelector(selector);
+            if(target) {
+                target.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+
+        const backToTopButton = document.getElementById('back-to-top');
+        if (backToTopButton) {
+            backToTopButton.addEventListener('click', (event) => {
+                event.preventDefault();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+        }
+    </script>
+</body>
+</html>
